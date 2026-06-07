@@ -499,6 +499,22 @@ button:hover {
     margin-top: 5px;
     display: block;
 }
+/* ===== SCROLL BARRA ===== */
+#lista-pendientes::-webkit-scrollbar {
+    width: 6px;
+}
+#lista-pendientes::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+}
+#lista-pendientes::-webkit-scrollbar-thumb {
+    background: #22c55e;
+    border-radius: 3px;
+}
+#lista-pendientes::-webkit-scrollbar-thumb:hover {
+    background: #16a34a;
+}
+
 .btn-cerrar {
     width: 100%;
     padding: 12px;
@@ -513,4 +529,3 @@ button:hover {
 .btn-cerrar:hover {
     background: rgba(239,68,68,0.2);
 }
-/* validacion por admin*/
