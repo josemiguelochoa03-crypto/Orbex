@@ -1,3 +1,21 @@
+/*  barra de desplazamiento */
+html::-webkit-scrollbar {
+    width: 8px;
+}
+html::-webkit-scrollbar-track {
+    background: #0a0f0d;
+}
+html::-webkit-scrollbar-thumb {
+    background: #22c55e;
+    border-radius: 4px;
+}
+html::-webkit-scrollbar-thumb:hover {
+    background: #16a34a;
+}
+html {
+    scroll-behavior: smooth;
+}
+
 /*fondo de la pagina*/
 body{
     background-color: #0a0f0d;
@@ -528,4 +546,53 @@ button:hover {
 }
 .btn-cerrar:hover {
     background: rgba(239,68,68,0.2);
+}
+
+/* ===== ANIMACIÓN PUNTOS ===== */
+.animacion-puntos {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #22c55e;
+    text-shadow: 0 0 30px rgba(34,197,94,0.5);
+    pointer-events: none;
+    z-index: 5000;
+    animation: subirPuntos 1.2s ease-out forwards;
+}
+@keyframes subirPuntos {
+    0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) translateY(-60px) scale(1.2); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-120px) scale(1); }
+}
+
+/* ===== ESTADÍSTICA MATERIAL ===== */
+.estadistica-material {
+    background: #0f1513;
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+.estadistica-material p {
+    margin: 3px 0;
+}
+
+/* ===== BOTÓN EXPORTAR ===== */
+.btn-exportar {
+    width: 100%;
+    padding: 12px;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.3);
+    color: #22c55e;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 15px;
+}
+.btn-exportar:hover {
+    background: rgba(34,197,94,0.2);
 }
