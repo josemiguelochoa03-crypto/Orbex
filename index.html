@@ -167,7 +167,7 @@
     <p>Colegio de itagui, la luis carlos galan sarmiento, antioquia - colombia</p>
 </footer>
 <button onclick="abrirValidacion()" style="position: fixed; bottom: 20px; left: 20px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; padding: 12px 20px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; z-index: 999; box-shadow: 0 4px 15px rgba(245,158,11,0.4);">
-    🛠 Validador
+    🛠 Validador <span id="pendientes-count" style="background: #ef4444; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; margin-left: 5px;"></span>
 </button>
 
 <div id="panel-validacion" class="modal">
@@ -175,10 +175,9 @@
         <span class="modal-cerrar" onclick="cerrarValidacion()">&times;</span>
         <h2>Panel de Validación</h2>
         <p style="color: #6b7280; margin-bottom: 20px;">Revisa y aprueba los registros de reciclaje</p>
-        <div id="lista-pendientes"></div>
+        <div id="lista-pendientes" style="max-height: 400px; overflow-y: auto; padding-right: 5px;"></div>
     </div>
 </div>
     <script src="script.js"></script>
 </body>
 </html>
-<!-- añadido control de valididacion por Admin --!>
