@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbex</title>
+    <link rel="stylesheet" href="estilos.css">
+    
+</head>
+<body>
+<!-- Modal de registro -->
+<div id="modal-registro" class="modal">
+    <div class="modal-contenido">
+        <span class="modal-cerrar" onclick="cerrarModal()">&times;</span>
+        <h2>Ingresa tu informacion personal</h2>
+        <input type="text" id="input-nombre" placeholder="Nombre completo">
+        <input type="text" id="input-id" placeholder="ID estudiantil">
+        <button onclick="registrarDesdeModal()">Ingresar</button>
+    </div>
+</div>
+    <!-- barra de navegación -->
+    <header>
+        <nav>
+            <a href="#">Orbex</a>
+            <a href="#inicio">Inicio</a>
+            <a href="#aprende">Aprende</a>
+            <a href="#materiales">Materiales</a>
+            <a href="#recompensas">Recompensas</a>
+            <a href="#" onclick="verPerfil(); return false;">Perfil</a>
+        </nav>
+    </header>
+    <!-- secciones-->
+<main>
+    <section id="inicio">
+        <h1>Aprende, recicla y gana recompensas</h1>
+        <p>recicla tus residuos y conviertelos en puntos que puedas canjear por beneficios escolares</p>
+        <button onclick="ingresar()">Empezar a reciclar</button>
+    </section>
+
+    <section id="estadisticas">
+        <div class="stat">
+            <span class="stat-numero">4</span>
+            <p>Materiales Reciclables</p>
+        </div>
+        <div class="stat">
+            <span class="stat-numero" id="stat-puntos">0</span>
+            <p>Puntos en tu cuenta</p>
+        </div>
+        <div class="stat">
+            <span class="stat-numero">4</span>
+            <p>Recompensas Disponibles</p>
+        </div>
+        <div class="stat">
+            <span class="stat-numero">100%</span>
+            <p>Hecho por estudiantes</p>
+        </div>
+    </section>
+
+    <section id="aprende">
+        <h2>¿Cómo funciona?</h2>
+        <p class="subtitulo">Tres pasos simples para empezar a reciclar y ganar</p>
+        <div class="pasos">
+            <div class="paso">
+                <div class="paso-numero">1</div>
+                <div class="paso-icono">♻️</div>
+                <h3>Separa tus residuos</h3>
+                <p>Clasifica el plástico, papel, vidrio y orgánico en bolsas diferentes.</p>
+            </div>
+            <div class="paso">
+                <div class="paso-numero">2</div>
+                <div class="paso-icono">📸</div>
+                <h3>Tomas una foto</h3>
+                <p>Subes la evidencia de tu reciclaje para que sea validada.</p>
+            </div>
+            <div class="paso">
+                <div class="paso-numero">3</div>
+                <div class="paso-icono">🎁</div>
+                <h3>Gana y canjea</h3>
+                <p>Recibe puntos y cámbialos por beneficios académicos.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="materiales">
+        <h2>Materiales Reciclables</h2>
+        <ul>
+            <li>♻️ Plástico</li>
+            <li>📄 Papel</li>
+            <li>📦 Cartón</li>
+            <li>🥃 Vidrio</li>
+            <li>🔩 Metal</li>
+        </ul>
+ <div id="reciclaje-form">
+        <h3>📸 Subir evidencia de reciclaje</h3>
+        <div id="foto-area" onclick="document.getElementById('foto-input').click()">
+            <p id="foto-texto">Haz clic para seleccionar una foto</p>
+        </div>
+        <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="vistaPreviaFoto(event)">
+        <div id="foto-preview" style="display:none; margin-bottom:15px;">
+            <img id="foto-imagen" style="width:100%; border-radius:12px;">
+        </div>
+        <select id="tipoMaterial">
+            <option value="plastico">♻️ Plástico</option>
+            <option value="papel">📄 Papel</option>
+            <option value="vidrio">🥃 Vidrio</option>
+            <option value="organico">🌿 Orgánico</option>
+        </select>
+        <input type="number" id="cantidadKg" placeholder="Kilogramos" step="0.1" min="0.1">
+        <button onclick="registrarReciclaje()">Enviar evidencia</button>
+        <p id="mensajeReciclaje"></p>
+ </div>            
+    </section>
+
+    <section id="recompensas">
+        <h2>Recompensas</h2>
+        <div id="lista-recompensas"></div>
+    </section>
+
+       <section id="perfil" style="display: none;">
+        <div class="perfil-container">
+            <div class="perfil-cabecera">
+                <div class="perfil-avatar" id="perfil-avatar">J</div>
+                <div>
+                    <h2 id="perfil-nombre">Nombre</h2>
+                    <p id="perfil-id">ID: 000000</p>
+                    <p id="perfil-nivel">Nivel 1 - Principiante</p>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="cambiarTab('datos')">Mis datos</button>
+                <button class="tab" onclick="cambiarTab('historial')">Historial</button>
+                <button class="tab" onclick="cambiarTab('canjes')">Canjes</button>
+            </div>
+
+            <div id="tab-datos" class="tab-contenido activo">
+                <div class="datos-grid">
+                    <div class="dato-card">
+                        <span class="dato-numero" id="perfil-puntos">0</span>
+                        <span class="dato-etiqueta">Puntos</span>
+                    </div>
+                    <div class="dato-card">
+                        <span class="dato-numero" id="perfil-reciclajes">0</span>
+                        <span class="dato-etiqueta">Reciclajes</span>
+                    </div>
+                    <div class="dato-card">
+                        <span class="dato-numero" id="perfil-canjes">0</span>
+                        <span class="dato-etiqueta">Canjes</span>
+                    </div>
+                </div>
+                <button onclick="cerrarSesion()" class="btn-cerrar">Cerrar sesión</button>
+            </div>
+
+            <div id="tab-historial" class="tab-contenido">
+                <div id="lista-historial"></div>
+            </div>
+
+            <div id="tab-canjes" class="tab-contenido">
+                <div id="lista-canjes-perfil"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2026 Orbex. Proyecto ambiental escolar.</p>
+    <p>Colegio de itagui, la luis carlos galan sarmiento, antioquia - colombia</p>
+</footer>
+<button onclick="abrirValidacion()" style="position: fixed; bottom: 20px; left: 20px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; padding: 12px 20px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; z-index: 999; box-shadow: 0 4px 15px rgba(245,158,11,0.4);">
+    🛠 Validador
+</button>
+
+<div id="panel-validacion" class="modal">
+    <div class="modal-contenido" style="max-width: 500px;">
+        <span class="modal-cerrar" onclick="cerrarValidacion()">&times;</span>
+        <h2>Panel de Validación</h2>
+        <p style="color: #6b7280; margin-bottom: 20px;">Revisa y aprueba los registros de reciclaje</p>
+        <div id="lista-pendientes"></div>
+    </div>
+</div>
+    <script src="script.js"></script>
+</body>
+</html>
