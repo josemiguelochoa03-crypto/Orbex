@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -148,6 +148,8 @@
                         <span class="dato-etiqueta">Canjes</span>
                     </div>
                 </div>
+                <div id="estadisticas-materiales"></div>
+                <button onclick="exportarHistorial()" class="btn-exportar">📥 Exportar historial (.txt)</button>
                 <button onclick="cerrarSesion()" class="btn-cerrar">Cerrar sesión</button>
             </div>
 
@@ -170,6 +172,27 @@
     🛠 Validador <span id="pendientes-count" style="background: #ef4444; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; margin-left: 5px;"></span>
 </button>
 
+<div id="modal-clave" class="modal">
+    <div class="modal-contenido" style="max-width: 360px; text-align: center;">
+        <span class="modal-cerrar" onclick="cerrarModalClave()">&times;</span>
+        <h2 style="color: #f59e0b;">🔐 Clave de Validador</h2>
+        <p style="color: #6b7280; margin-bottom: 20px;">Ingresa la clave para acceder al panel</p>
+        <input type="password" id="clave-input" placeholder="••••••••" style="text-align: center; letter-spacing: 4px; font-size: 1.2rem;" onkeydown="if(event.key==='Enter')verificarClave()">
+        <button onclick="verificarClave()" style="background: linear-gradient(135deg, #f59e0b, #d97706);">Ingresar</button>
+        <p id="clave-error" style="color: #ef4444; margin-top: 15px; display: none; font-size: 0.9rem;">Clave incorrecta</p>
+    </div>
+</div>
+<div id="modal-confirmar-canje" class="modal">
+    <div class="modal-contenido" style="max-width: 400px;">
+        <span class="modal-cerrar" onclick="cancelarCanje()">&times;</span>
+        <h2>¿Confirmar canje?</h2>
+        <p id="texto-confirmar-canje" style="color: #6b7280; margin-bottom: 25px;"></p>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="cancelarCanje()" class="cancel-btn" style="flex:1; background: rgba(255,255,255,0.05); color: white;">Cancelar</button>
+            <button onclick="confirmarCanje()" style="flex:1; background: #22c55e; color: #0a0f0d;">Sí, canjear</button>
+        </div>
+    </div>
+</div>
 <div id="panel-validacion" class="modal">
     <div class="modal-contenido" style="max-width: 500px;">
         <span class="modal-cerrar" onclick="cerrarValidacion()">&times;</span>
