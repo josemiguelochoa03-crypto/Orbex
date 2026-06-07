@@ -9,6 +9,7 @@ let puntuajeMateriales = {
     }
 
 let idValidador = "ADMIN001";
+let canjePendiente = null;
 
 let catalogoRecompensas = [
     {nombre:"Bonificacion +0.5 en cualquier materia", puntos: 100 },
@@ -56,6 +57,14 @@ function sonarBeep() {
         osc.start();
         setTimeout(function() { osc.stop(); }, 150);
     } catch(e) {}
+}
+
+function mostrarAnimacionPuntos(cantidad) {
+    let el = document.createElement("div");
+    el.className = "animacion-puntos";
+    el.textContent = "+" + cantidad;
+    document.body.appendChild(el);
+    setTimeout(function() { el.remove(); }, 1200);
 }
 
 function mostrarToast(mensaje) {
@@ -188,9 +197,21 @@ function canjear(costo, nombre) {
         mostrarToast("No tienes suficientes puntos");
         return;
     }
+    canjePendiente = { costo: costo, nombre: nombre };
+    document.getElementById("texto-confirmar-canje").textContent =
+        "¿Estás seguro de canjear \"" + nombre + "\" por " + costo + " puntos?";
+    document.getElementById("modal-confirmar-canje").classList.add("mostrar");
+}
+
+function confirmarCanje() {
+    if (!canjePendiente) return;
+    let costo = canjePendiente.costo;
+    let nombre = canjePendiente.nombre;
+    canjePendiente = null;
+    document.getElementById("modal-confirmar-canje").classList.remove("mostrar");
+
     puntos -= costo;
     guardarPuntos();
-    // Guardar historial de canjes
     let canjes = JSON.parse(localStorage.getItem("Orbexcanjes_" + usuarioActual.id) || "[]");
     canjes.push({ nombre: nombre, puntos: costo, fecha: new Date().toLocaleString("es-CO") });
     localStorage.setItem("Orbexcanjes_" + usuarioActual.id, JSON.stringify(canjes));
@@ -203,6 +224,11 @@ function canjear(costo, nombre) {
             "<button onclick='verPerfil()'>Ir a mi perfil</button>";
     }
     mostrarToast("¡Canjeaste: " + nombre + "!");
+}
+
+function cancelarCanje() {
+    canjePendiente = null;
+    document.getElementById("modal-confirmar-canje").classList.remove("mostrar");
 }
 
 function actualizarContadorPendientes() {
@@ -226,12 +252,26 @@ function abrirValidacion() {
         mostrarToast("No tienes permisos de validador");
         return;
     }
-    let clave = prompt("Ingresa la clave de validador:");
+    document.getElementById("modal-clave").classList.add("mostrar");
+    setTimeout(function(){ document.getElementById("clave-input").focus(); }, 200);
+}
+
+function cerrarModalClave() {
+    document.getElementById("modal-clave").classList.remove("mostrar");
+    document.getElementById("clave-input").value = "";
+    document.getElementById("clave-error").style.display = "none";
+}
+
+function verificarClave() {
+    let clave = document.getElementById("clave-input").value;
     if (clave === "orbex2026") {
+        cerrarModalClave();
         document.getElementById("panel-validacion").classList.add("mostrar");
         cargarPendientes();
     } else {
-        mostrarToast("Clave incorrecta");
+        document.getElementById("clave-error").style.display = "block";
+        document.getElementById("clave-input").value = "";
+        document.getElementById("clave-input").focus();
     }
 }
 
@@ -286,6 +326,7 @@ function aprobar(index) {
         mostrarRecompensas();
         actualizarStatPuntos();
         sonarBeep();
+        mostrarAnimacionPuntos(p.puntos);
     }
 
     mostrarToast("Aprobado: +" + p.puntos + " pts para " + p.estudiante);
@@ -328,6 +369,7 @@ function actualizarPerfil() {
 
     cargarHistorial();
     cargarCanjesPerfil();
+    mostrarEstadisticasMateriales();
 }
 
 function cambiarTab(tab) {
@@ -375,6 +417,63 @@ function cargarCanjesPerfil() {
     }
     document.getElementById("lista-canjes-perfil").innerHTML = html;
 }
+function mostrarEstadisticasMateriales() {
+    let pendientes = JSON.parse(localStorage.getItem("Orbexpendientes") || "[]");
+    let misRegistros = pendientes.filter(function(p) {
+        return p.idEstudiante === usuarioActual.id && p.estado === "aprobado";
+    });
+    let materiales = {};
+    let totalPts = 0;
+    misRegistros.forEach(function(p) {
+        materiales[p.tipo] = (materiales[p.tipo] || 0) + p.kg;
+        totalPts += p.puntos;
+    });
+    let iconos = { plastico: "♻️", papel: "📄", vidrio: "🥃", organico: "🌿" };
+    let html = '<h3 style="color: #22c55e; margin-bottom: 15px; font-size: 1.2rem;">📊 Desglose por material</h3>';
+    html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">';
+    for (let tipo in materiales) {
+        html += '<div class="estadistica-material">' +
+            '<span style="font-size: 1.5rem;">' + (iconos[tipo] || "📦") + '</span>' +
+            '<p style="color: #22c55e; font-weight: bold; font-size: 1.3rem; margin: 5px 0;">' + materiales[tipo] + ' kg</p>' +
+            '<p style="color: #6b7280; font-size: 0.85rem;">' + tipo.charAt(0).toUpperCase() + tipo.slice(1) + '</p></div>';
+    }
+    html += '</div>';
+    html += '<p style="color: #6b7280; text-align: center; font-size: 0.95rem;">Total de puntos ganados: <strong style="color: #22c55e;">' + totalPts + '</strong></p>';
+    document.getElementById("estadisticas-materiales").innerHTML = html;
+}
+
+function exportarHistorial() {
+    let pendientes = JSON.parse(localStorage.getItem("Orbexpendientes") || "[]");
+    let misRegistros = pendientes.filter(function(p) { return p.idEstudiante === usuarioActual.id && p.estado === "aprobado"; });
+    let canjes = JSON.parse(localStorage.getItem("Orbexcanjes_" + usuarioActual.id) || "[]");
+    let texto = "=== ORBEX - HISTORIAL DE RECICLAJE ===\n";
+    texto += "Estudiante: " + usuarioActual.nombre + " (ID: " + usuarioActual.id + ")\n";
+    texto += "Fecha de exportacion: " + new Date().toLocaleString("es-CO") + "\n\n";
+    texto += "--- RECICLAJES APROBADOS ---\n";
+    if (misRegistros.length === 0) {
+        texto += "(Ninguno)\n";
+    } else {
+        misRegistros.forEach(function(p) {
+            texto += p.fecha + " | " + p.kg + " kg de " + p.tipo + " | +" + p.puntos + " pts\n";
+        });
+    }
+    texto += "\n--- CANJES REALIZADOS ---\n";
+    if (canjes.length === 0) {
+        texto += "(Ninguno)\n";
+    } else {
+        canjes.forEach(function(c) {
+            texto += c.fecha + " | " + c.nombre + " | -" + c.puntos + " pts\n";
+        });
+    }
+    let blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "orbex_historial_" + usuarioActual.id + ".txt";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 function cerrarSesion() {
     usuarioActual = null;
     puntos = 0;
