@@ -8,6 +8,8 @@ let puntuajeMateriales = {
     organico: 2.5,
     }
 
+let idValidador = "ADMIN001";
+
 let catalogoRecompensas = [
     {nombre:"Bonificacion +0.5 en cualquier materia", puntos: 100 },
     {nombre:"bonificacion +1.0 en tareas", puntos: 200 },
@@ -178,6 +180,14 @@ function actualizarStatPuntos() {
 }
 
 function abrirValidacion() {
+    if (!usuarioActual) {
+        mostrarToast("Debes iniciar sesión primero");
+        return;
+    }
+    if (usuarioActual.id !== idValidador) {
+        mostrarToast("No tienes permisos de validador");
+        return;
+    }
     let clave = prompt("Ingresa la clave de validador:");
     if (clave === "orbex2026") {
         document.getElementById("panel-validacion").classList.add("mostrar");
