@@ -27,6 +27,8 @@ if (usuarioGuardado) {
     usuarioActual = JSON.parse(usuarioGuardado);
     puntos = parseInt(localStorage.getItem("Orbexpuntos")) || 0;
 }
+actualizarContadorPendientes();
+
 if (usuarioActual) {
     document.getElementById("inicio").innerHTML =
     "<h1>Bienvenido, " + usuarioActual.nombre + "</h1>" +
@@ -44,6 +46,18 @@ function ingresar() {
     document.getElementById("modal-registro").classList.add("mostrar");
 }
 
+function sonarBeep() {
+    try {
+        let ctx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = ctx.createOscillator();
+        osc.frequency.value = 800;
+        osc.type = "sine";
+        osc.connect(ctx.destination);
+        osc.start();
+        setTimeout(function() { osc.stop(); }, 150);
+    } catch(e) {}
+}
+
 function mostrarToast(mensaje) {
     let toast = document.getElementById("toast");
     if (!toast) {
@@ -59,6 +73,17 @@ function mostrarToast(mensaje) {
     }, 2500);
 }
 
+function limpiarRegistrosViejos() {
+    let pendientes = JSON.parse(localStorage.getItem("Orbexpendientes") || "[]");
+    let ahora = Date.now();
+    let unMes = 30 * 24 * 60 * 60 * 1000;
+    let nuevos = pendientes.filter(function(p) { return (ahora - p.id) < unMes; });
+    if (nuevos.length !== pendientes.length) {
+        localStorage.setItem("Orbexpendientes", JSON.stringify(nuevos));
+    }
+}
+limpiarRegistrosViejos();
+
 function cerrarModal() {
     document.getElementById("modal-registro").classList.remove("mostrar");
 }
@@ -71,7 +96,7 @@ function registrarDesdeModal() {
         return;
     }
     usuarioActual = { nombre: nombre, id: id };
-    puntos = 0;
+    puntos = parseInt(localStorage.getItem("Orbexpuntos_" + id) || "0");
     guardarusuario();
     guardarPuntos();
     cerrarModal();
@@ -89,6 +114,11 @@ function guardarusuario() {
 function vistaPreviaFoto(event) {
     let archivo = event.target.files[0];
     if (!archivo) return;
+    if (archivo.size > 2 * 1024 * 1024) {
+        mostrarToast("La foto es muy grande. Máximo 2MB");
+        event.target.value = "";
+        return;
+    }
     let lector = new FileReader();
     lector.onload = function(e) {
         document.getElementById("foto-imagen").src = e.target.result;
@@ -129,6 +159,7 @@ function registrarReciclaje() {
         estado: "pendiente"
     });
     localStorage.setItem("Orbexpendientes", JSON.stringify(pendientes));
+    actualizarContadorPendientes();
 
     document.getElementById("mensajeReciclaje").textContent =
         "✅ Evidencia enviada. Espera validación para recibir +" + puntosGanados + " puntos";
@@ -172,6 +203,13 @@ function canjear(costo, nombre) {
             "<button onclick='verPerfil()'>Ir a mi perfil</button>";
     }
     mostrarToast("¡Canjeaste: " + nombre + "!");
+}
+
+function actualizarContadorPendientes() {
+    let pendientes = JSON.parse(localStorage.getItem("Orbexpendientes") || "[]");
+    let count = pendientes.filter(function(p) { return p.estado === "pendiente"; }).length;
+    let el = document.getElementById("pendientes-count");
+    if (el) el.textContent = count > 0 ? count : "";
 }
 
 function actualizarStatPuntos() {
@@ -239,6 +277,7 @@ function aprobar(index) {
     localStorage.setItem("Orbexpuntos_" + p.idEstudiante, puntosEst.toString());
 
     localStorage.setItem("Orbexpendientes", JSON.stringify(pendientes));
+    actualizarContadorPendientes();
 
     // Si el usuario actual es el que recibe los puntos, actualizar en vivo
     if (usuarioActual && usuarioActual.id === p.idEstudiante) {
@@ -246,6 +285,7 @@ function aprobar(index) {
         guardarPuntos();
         mostrarRecompensas();
         actualizarStatPuntos();
+        sonarBeep();
     }
 
     mostrarToast("Aprobado: +" + p.puntos + " pts para " + p.estudiante);
@@ -259,6 +299,7 @@ function rechazar(index) {
 
     p.estado = "rechazado";
     localStorage.setItem("Orbexpendientes", JSON.stringify(pendientes));
+    actualizarContadorPendientes();
 
     mostrarToast("Registro rechazado");
     cargarPendientes();
@@ -337,5 +378,7 @@ function cargarCanjesPerfil() {
 function cerrarSesion() {
     usuarioActual = null;
     puntos = 0;
+    localStorage.removeItem("Orbexusuario");
+    localStorage.removeItem("Orbexpuntos");
     location.reload();
 }
